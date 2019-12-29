@@ -1,0 +1,10 @@
+{
+  "extends": "eslint-config-egg",
+  "rules": {
+    "semi": [
+      "error",
+      "never"
+    ],
+    "array-bracket-spacing": 0
+  }
+}
