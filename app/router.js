@@ -15,9 +15,11 @@ module.exports = app => {
   router.get('/api/captcha', 'captcha.index')
   router.resources('role', '/api/role', 'role')
 
-  router.get('access', '/api/access/tree', 'access.tree')
+  router.get('/api/access/tree', 'access.tree')
   router.resources('access', '/api/access', 'access')
   router.resources('roleAccess', '/api/role-access', 'roleAccess')
+
+  router.post('/api/file/upload', 'file.index')
 
 
 }

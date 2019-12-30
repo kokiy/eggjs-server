@@ -51,6 +51,11 @@ module.exports = appInfo => {
         return _.find(whiteRouterList, ({ path, method }) => path === ctx.path && method === ctx.method)
       },
     },
+    multipart: {
+      fileSize: '50mb',
+      mode: 'stream',
+      fileExtensions: ['.xls', '.txt'], // 扩展几种上传的文件格式
+    },
   }
 
 
