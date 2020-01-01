@@ -31,6 +31,7 @@ module.exports = app => {
       type: BOOLEAN,
       defaultValue: false,
     },
+    avatar: STRING,
   })
 
   user.associate = () => {

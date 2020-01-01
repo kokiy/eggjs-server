@@ -46,16 +46,14 @@ class UserController extends Controller {
     }
   }
 
-  async update() {
-    const ctx = this.ctx
-    const id = ctx.params.id
-    const user = await ctx.model.User.findByPk(id)
+  async updateCurrentUser() {
+    const user = await this.ctx.model.User.findByPk(this.ctx.session.user.id)
     if (!user) {
       this.ctx.throw(500, '该用户不存在')
     }
-
-    await user.update(ctx.request.body)
-    ctx.body = {
+    const { avatar } = this.ctx.request.body
+    await user.update({ avatar })
+    this.ctx.body = {
       msg: '更新成功',
     }
   }
@@ -98,10 +96,10 @@ class UserController extends Controller {
     if (!res) {
       ctx.throw(500, '该用户没有注册')
     } else if (res.password === encryPassword) {
+      // 角色id ,is_super 一般不怎么变化缓存起来
       ctx.session.user = {
+        id: res.id,
         roleId: res.roleId,
-        username: res.username,
-        mobile: res.mobile,
         is_super: res.is_super,
       }
       ctx.body = {
@@ -120,13 +118,8 @@ class UserController extends Controller {
   }
 
   async currentUser() {
-    if (this.ctx.session.user) {
-      const role = await this.ctx.model.Role.findByPk(this.ctx.session.user.roleId)
-      const roleAccesses = await role.getAccesses({ attributes: ['requests', 'name', 'key', 'type'], raw: true })
-      this.ctx.body = { ...this.ctx.session.user, accesses: roleAccesses }
-    } else {
-      this.ctx.throw(401, '请登录')
-    }
+    const user = await this.ctx.service.user.getCurrentUser()
+    this.ctx.body = user
   }
 }
 

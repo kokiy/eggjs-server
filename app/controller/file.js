@@ -21,28 +21,60 @@ const mkdirsSync = dirname => {
     return true
   }
 }
+
+const getFilePath = filename => {
+  const newFilename = `${Date.now()}${Number.parseInt(
+    Math.random() * 1000
+  )}${path.extname(filename).toLocaleLowerCase()}`
+  const dirname = dayjs(Date.now()).format('YYYY/MM/DD')
+
+  mkdirsSync(path.join(uplaodBasePath, dirname))
+  return {
+    savePath: path.join(uplaodBasePath, dirname, newFilename),
+    readPath: path.join('public/uploads', dirname, newFilename),
+  }
+
+}
 class FileUploadController extends Controller {
 
 
   async index() {
     const stream = await this.ctx.getFileStream()
-    const filename = `${Date.now()}${Number.parseInt(
-      Math.random() * 1000
-    )}${path.extname(stream.filename).toLocaleLowerCase()}`
-    const dirname = dayjs(Date.now()).format('YYYY/MM/DD')
-
-    mkdirsSync(path.join(uplaodBasePath, dirname))
-    const target = path.join(uplaodBasePath, dirname, filename)
-    const writeStream = fs.createWriteStream(target)
+    const { savePath, readPath } = getFilePath(stream.filename)
+    const writeStream = fs.createWriteStream(savePath)
     try {
       await awaitWriteStream(stream.pipe(writeStream))
     } catch (err) {
       await sendToWormhole(stream)
       this.ctx.throw(500, err)
     }
-    return {
-      url: path.join('public/uploads', dirname, filename),
+    this.ctx.body = {
+      url: readPath,
       fields: stream.fields,
+    }
+  }
+
+  async batch() {
+    const parts = this.ctx.multipart({ autoFields: true })
+    let part
+    const files = []
+    while ((part = await parts()) != null) {
+      if (!part.filename) {
+        return
+      }
+      const { savePath, readPath } = getFilePath(part.filename)
+      const writeStream = fs.createWriteStream(savePath)
+      try {
+        await awaitWriteStream(part.pipe(writeStream))
+        files.push({ [part.filename]: readPath })
+      } catch (err) {
+        await sendToWormhole(part)
+        this.ctx.throw(500, err)
+      }
+    }
+    this.ctx.body = {
+      files,
+      fields: parts.field,
     }
   }
 }

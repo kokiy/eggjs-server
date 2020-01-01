@@ -10,6 +10,8 @@ module.exports = app => {
   router.get('/api/user/logout', 'user.logout')
   router.get('/api/user/current', 'user.currentUser')
   router.put('/api/user/role-update', 'user.updateRole')
+  router.put('/api/user/update', 'user.updateCurrentUser')
+
 
   router.resources('user', '/api/user', 'user')
   router.get('/api/captcha', 'captcha.index')
@@ -20,6 +22,7 @@ module.exports = app => {
   router.resources('roleAccess', '/api/role-access', 'roleAccess')
 
   router.post('/api/file/upload', 'file.index')
+  router.post('/api/file/batch-upload', 'file.batch')
 
 
 }

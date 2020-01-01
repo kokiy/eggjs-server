@@ -10,7 +10,6 @@ class AuthService extends Service {
     const { roleId, is_super } = this.ctx.session.user
     if (is_super) {
       return true
-
     }
     const role = await this.ctx.model.Role.findByPk(roleId)
     const roleAccesses = await role.getAccesses({ attributes: ['requests'], where: { parent_id: { [Op.not]: null } }, raw: true })
