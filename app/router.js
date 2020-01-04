@@ -23,6 +23,7 @@ module.exports = app => {
 
   router.post('/api/file/upload', 'file.index')
   router.post('/api/file/batch-upload', 'file.batch')
+  router.post('/api/file/chunk-upload', 'file.chunk')
 
 
 }
