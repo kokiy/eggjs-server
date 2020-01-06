@@ -1,4 +1,6 @@
 'use strict'
+
+const deleteDir = require('./delete-dir')
 module.exports = {
   formatDate(timeStamp) {
     return timeStamp
@@ -11,5 +13,5 @@ module.exports = {
       data,
     }
   },
-
+  deleteDir,
 }

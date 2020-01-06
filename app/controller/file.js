@@ -39,32 +39,36 @@ const getSpliceFilePath = async ({ index, token }, filename) => {
 // 合并分片文件
 const mergeChunk = async ({ ctx, token, filename }) => {
   const dirname = `temp/${token}`
-  const chunkfileList = fs.readdirSync(path.join(uplaodBasePath, dirname))
+  const chunkPath = path.join(uplaodBasePath, dirname)
+  const chunkfileList = fs.readdirSync(chunkPath)
   const sortedChunkfileList = _.sortBy(chunkfileList, i => _.parseInt(i.split(',')[0]))
   const chunkFilePath = _.map(sortedChunkfileList, chunk => path.join(uplaodBasePath, dirname, chunk))
   // 获取读取每个片段的路径
   const { savePath, readPath } = await getSaveAndReadPath(filename)
   const writeStream = fs.createWriteStream(savePath)
-  const writeFile = async () => {
-    const readSlicePath = chunkFilePath.shift()
-    const readStream = fs.createReadStream(readSlicePath)
-    try {
-      readStream.pipe(writeStream, { end: false })
-      readStream.on('end', () => {
-        if (!_.isEmpty(chunkFilePath)) {
-          writeFile()
-        }
-      })
-    } catch (err) {
-      await sendToWormhole(readStream)
-      ctx.throw(500, err)
-    }
-  }
-  writeFile()
+  return new Promise(resolve => {
+    const writeFile = async () => {
+      const readSlicePath = chunkFilePath.shift()
+      const readStream = fs.createReadStream(readSlicePath)
+      try {
+        readStream.pipe(writeStream, { end: false })
+        readStream.on('end', () => {
+          if (_.isEmpty(chunkFilePath)) {
+            // 删除切片文件
+            ctx.helper.deleteDir(chunkPath)
+            resolve({ url: readPath })
+          } else {
+            writeFile()
 
-  return {
-    url: readPath,
-  }
+          }
+        })
+      } catch (err) {
+        await sendToWormhole(readStream)
+        ctx.throw(500, err)
+      }
+    }
+    writeFile()
+  })
 }
 
 class FileUploadController extends Controller {
