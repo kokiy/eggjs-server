@@ -56,6 +56,14 @@ module.exports = appInfo => {
       mode: 'stream',
       fileExtensions: ['.xls', '.flv', '.txt', '.pdf', ''], // 扩展几种上传的文件格式
     },
+    redis: {
+      client: {
+        port: 6379, // Redis port
+        host: '127.0.0.1', // Redis host
+        password: 'auth',
+        db: 0,
+      },
+    },
   }
 
 
