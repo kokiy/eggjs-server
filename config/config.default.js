@@ -48,7 +48,7 @@ module.exports = appInfo => {
     middleware: ['errorHandler', 'validate', 'auth'],
     auth: {
       ignore: ctx => {
-        return _.find(whiteRouterList, ({ path, method }) => path === ctx.path && method === ctx.method)
+        return _.find(whiteRouterList, ({ path, method }) => method === ctx.method && new RegExp(path).test(ctx.path))
       },
     },
     multipart: {

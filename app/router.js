@@ -25,5 +25,8 @@ module.exports = app => {
   router.post('/api/file/batch-upload', 'file.batch')
   router.post('/api/file/chunk-upload', 'file.chunk')
 
+  router.post('/api/message/subscribe', 'message.subscribe')
+  router.post('/api/message/push', 'message.push')
+
 
 }

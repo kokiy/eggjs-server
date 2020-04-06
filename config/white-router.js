@@ -14,6 +14,7 @@ module.exports = [
   { path: '/api/user', method: POST },
   { path: '/api/captcha', method: GET },
   { path: '/api/user/current', method: GET },
+  { path: '/api/message/*', method: POST },
 
 
 ]
